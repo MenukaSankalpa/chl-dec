@@ -31,8 +31,8 @@ export default function Home() {
         const data = await response.json();
         setGreetings(data.greetings);
       }
-    } catch (err) {
-      console.error('Failed to fetch greetings:', err);
+    } catch {
+      console.error('Failed to fetch greetings');
     }
   };
 
@@ -69,7 +69,7 @@ export default function Home() {
         const data = await response.json();
         setError(data.error || 'Failed to submit greeting');
       }
-    } catch (err) {
+    } catch {
       setError('Failed to submit greeting');
     } finally {
       setLoading(false);
