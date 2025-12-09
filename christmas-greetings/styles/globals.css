@@ -1,26 +1,92 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ---------------- Snowfall animation ---------------- */
+@keyframes fall {
+  0% { transform: translateY(-10%); }
+  100% { transform: translateY(110vh); }
+}
+.animate-fall {
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ---------------- Background blink animation ---------------- */
+@keyframes blink {
+  0%, 49%, 100% { opacity: 0; }
+  25%, 75% { opacity: 1; }
+}
+.animate-blink {
+  animation: blink 1s infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---------------- Flying Santa/Deer icons ---------------- */
+@keyframes santaFly {
+  0% { transform: translateX(-150%) rotate(-10deg); }
+  50% { transform: translateX(50%) rotate(10deg); }
+  100% { transform: translateX(120%) rotate(-10deg); }
+}
+.animate-santaFly {
+  animation-name: santaFly;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------------- Fade-in animation for cards/messages ---------------- */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 1s ease forwards;
+}
+
+/* ---------------- Glassmorphism style ---------------- */
+.bg-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 40px rgba(124, 58, 237, 0.3);
+  border-radius: 1.5rem; /* Rounded corners */
+}
+
+/* ---------------- Light/Dark mode tweaks ---------------- */
+.dark .bg-glass {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ---------------- Card shadows ---------------- */
+.card {
+  @apply rounded-xl p-4 bg-white/20 dark:bg-black/30 shadow-lg backdrop-blur-md border border-white/10;
+}
+
+/* ---------------- Smooth transition for all elements ---------------- */
+* {
+  transition: all 0.3s ease;
+}
+
+/* ---------------- Snowflake variations ---------------- */
+.snowflake {
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+
+/* ---------------- Optional festive colors ---------------- */
+.snow-white { background-color: white; }
+.snow-purple { background-color: #9b5de5; }
+
+/* Card subtle blinking/glow */
+@keyframes cardBlink {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.2), 0 0 20px rgba(0, 255, 0, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.5), 0 0 30px rgba(0, 255, 0, 0.5); }
+}
+
+.animate-cardBlink {
+  animation: cardBlink 2s infinite alternate;
 }
