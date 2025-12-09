@@ -9,8 +9,8 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
 
-  const trackAudioRef = useRef(null); // track01.mp3
-  const submitAudioRef = useRef(null); // music.mp3
+  const trackAudioRef = useRef(null);
+  const submitAudioRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
@@ -19,6 +19,7 @@ export default function Home() {
   const loadMessages = async () => {
     try {
       const res = await fetch('/api/greetings');
+      if (!res.ok) throw new Error('Failed to fetch messages');
       const data = await res.json();
       setMessages(data);
     } catch (err) {
@@ -30,7 +31,6 @@ export default function Home() {
     loadMessages();
   }, []);
 
-  // Play track01 when form opens
   useEffect(() => {
     if (!trackAudioRef.current) {
       trackAudioRef.current = new Audio('/track01.mp3');
@@ -41,7 +41,6 @@ export default function Home() {
   }, []);
 
   const handleFormDone = () => {
-    // Stop track01 and play music.mp3
     if (trackAudioRef.current) trackAudioRef.current.pause();
     if (!submitAudioRef.current) {
       submitAudioRef.current = new Audio('/music.mp3');
@@ -49,21 +48,19 @@ export default function Home() {
       submitAudioRef.current.volume = 0.2;
     }
     submitAudioRef.current.play().catch(() => {});
-
     setSubmitted(true);
     loadMessages();
   };
 
   return (
-    <div className="relative min-h-screen px-4 py-10 overflow-hidden">
+    <div className="relative min-h-screen px-4 py-10">
       <Background darkMode={darkMode} showSnow={!submitted} />
-
       <FestiveAnimation show={!submitted} darkMode={darkMode} />
 
       <div className="absolute top-4 right-4 z-50">
         <button
           onClick={() => setDarkMode(!darkMode)}
-          className="px-4 py-2 rounded bg-white/20 dark:bg-black/20 text-white"
+          className="px-4 py-2 rounded bg-white/20 dark:bg-black/20 text-white hover:scale-105 transition"
         >
           {darkMode ? 'Light Mode' : 'Dark Mode'}
         </button>
@@ -72,9 +69,9 @@ export default function Home() {
       {!submitted ? (
         <GreetingForm onDone={handleFormDone} darkMode={darkMode} />
       ) : (
-        <div className="relative w-full h-[90vh]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
           {messages.map((msg, idx) => (
-            <GreetingCard key={msg._id} g={msg} darkMode={darkMode} index={idx} />
+            <GreetingCard key={msg._id} g={msg} index={idx} />
           ))}
         </div>
       )}
