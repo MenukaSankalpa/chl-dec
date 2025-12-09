@@ -8,7 +8,9 @@ export default function Home() {
   const [list, setList] = useState([])
   const [submitted, setSubmitted] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
-  const audioRef = useRef(null) // audio instance
+
+  // ✅ SINGLE audio instance for whole app
+  const audioRef = useRef(null)
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode)
@@ -20,26 +22,27 @@ export default function Home() {
   }
   useEffect(() => { load() }, [])
 
-  const handleFormDone = () => {
-    // Play music after form submission
-    if (!audioRef.current) {
-      audioRef.current = new Audio('/track1.mp3') // put your track1.mp3 in public folder
-      audioRef.current.loop = true
-      audioRef.current.volume = 0.2
+  // ✅ plays music after SUBMIT (user gesture)
+  const handleFormDone = async () => {
+    try {
+      if (!audioRef.current) {
+        audioRef.current = new Audio('/track01.mp3') // ✅ correct path
+        audioRef.current.loop = true
+        audioRef.current.volume = 0.3
+      }
+      await audioRef.current.play()
+    } catch (e) {
+      console.error('Audio failed:', e)
     }
-    audioRef.current.play().catch(() => {})
+
     setSubmitted(true)
   }
 
   return (
     <div className="relative min-h-screen px-4 py-10 overflow-hidden">
-      {/* Background */}
-      <Background darkMode={darkMode} className="-z-20 fixed inset-0" showSnow={!submitted} />
-
-      {/* Snow + Flying Icons */}
+      <Background darkMode={darkMode} showSnow={!submitted} />
       <FestiveAnimation show={!submitted} darkMode={darkMode} />
 
-      {/* Dark/Light toggle */}
       <div className="absolute top-4 right-4 z-50">
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -53,7 +56,9 @@ export default function Home() {
         <GreetingForm onDone={handleFormDone} darkMode={darkMode} />
       ) : (
         <div className="relative w-full h-[90vh] overflow-hidden">
-          {list.map(g => <GreetingCard key={g._id} g={g} darkMode={darkMode} />)}
+          {list.map(g => (
+            <GreetingCard key={g._id} g={g} darkMode={darkMode} />
+          ))}
         </div>
       )}
     </div>
