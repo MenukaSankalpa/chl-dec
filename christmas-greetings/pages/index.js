@@ -9,30 +9,36 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
 
-  // ✅ SINGLE audio instance for whole app
-  const audioRef = useRef(null)
+  // ✅ Audio refs
+  const formAudioRef = useRef(null)
+  const submitAudioRef = useRef(null)
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode)
-  }, [darkMode])
-
+  // Load greetings
   const load = async () => {
     const r = await fetch('/api/greetings')
     setList(await r.json())
   }
   useEffect(() => { load() }, [])
 
-  // ✅ plays music after SUBMIT (user gesture)
-  const handleFormDone = async () => {
-    try {
-      if (!audioRef.current) {
-        audioRef.current = new Audio('/track01.mp3') // ✅ correct path
-        audioRef.current.loop = true
-        audioRef.current.volume = 0.3
-      }
-      await audioRef.current.play()
-    } catch (e) {
-      console.error('Audio failed:', e)
+  // Set dark/light mode
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode)
+  }, [darkMode])
+
+  // Play track01 on form load
+  useEffect(() => {
+    if (!submitted && formAudioRef.current) {
+      formAudioRef.current.play().catch(() => {})
+    }
+  }, [submitted])
+
+  const handleFormDone = () => {
+    // Stop form music
+    if (formAudioRef.current) formAudioRef.current.pause()
+
+    // Play music after submission
+    if (submitAudioRef.current) {
+      submitAudioRef.current.play().catch(() => {})
     }
 
     setSubmitted(true)
@@ -40,9 +46,18 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen px-4 py-10 overflow-hidden">
+      
+      {/* Audio Elements */}
+      <audio ref={formAudioRef} src="/track01.mp3" loop preload="auto" />
+      <audio ref={submitAudioRef} src="/music.mp3" loop preload="auto" />
+
+      {/* Background */}
       <Background darkMode={darkMode} showSnow={!submitted} />
+
+      {/* Snow + flying icons */}
       <FestiveAnimation show={!submitted} darkMode={darkMode} />
 
+      {/* Dark/Light toggle */}
       <div className="absolute top-4 right-4 z-50">
         <button
           onClick={() => setDarkMode(!darkMode)}
@@ -52,12 +67,13 @@ export default function Home() {
         </button>
       </div>
 
+      {/* Form or Cards */}
       {!submitted ? (
         <GreetingForm onDone={handleFormDone} darkMode={darkMode} />
       ) : (
-        <div className="relative w-full h-[90vh] overflow-hidden">
-          {list.map(g => (
-            <GreetingCard key={g._id} g={g} darkMode={darkMode} />
+        <div className="relative w-full h-[90vh]">
+          {list.map((g, idx) => (
+            <GreetingCard key={g._id || idx} g={g} darkMode={darkMode} index={idx} />
           ))}
         </div>
       )}

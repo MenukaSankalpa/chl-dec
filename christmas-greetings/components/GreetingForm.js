@@ -9,18 +9,15 @@ export default function GreetingForm({ onDone, darkMode }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  async function submit(e) {
+  const submit = async (e) => {
     e.preventDefault()
     setError('')
-
     if (!name.trim() || !message.trim()) {
       setError('Please enter your name and message')
       return
     }
-
     try {
       setLoading(true)
-
       await fetch('/api/greetings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,8 +25,7 @@ export default function GreetingForm({ onDone, darkMode }) {
       })
 
       confetti({ particleCount: 160, spread: 100, origin: { y: 0.6 } })
-
-      await onDone() // ✅ triggers music
+      onDone()
     } catch {
       setError('Something went wrong. Try again later.')
     } finally {
@@ -59,7 +55,6 @@ export default function GreetingForm({ onDone, darkMode }) {
         className={`w-full p-3 rounded-xl border outline-none focus:ring-2
           ${darkMode ? 'bg-black/40 border-white/10 text-white focus:ring-purple-600' : 'bg-white/50 border-purple-300 text-black focus:ring-purple-800'}`}
       />
-
       <input
         type="text"
         placeholder="Role / Title (optional)"
@@ -68,7 +63,6 @@ export default function GreetingForm({ onDone, darkMode }) {
         className={`w-full p-3 rounded-xl border outline-none focus:ring-2
           ${darkMode ? 'bg-black/40 border-white/10 text-white focus:ring-purple-600' : 'bg-white/50 border-purple-300 text-black focus:ring-purple-800'}`}
       />
-
       <textarea
         rows="4"
         placeholder="Write something beautiful..."
