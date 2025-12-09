@@ -13,7 +13,15 @@ const COMPANIES = [
   'CTL',
   'OCN',
   'CEYMED',
-  'CLL'
+  'CLL',
+  'STL',
+  'CSL',
+  'CWS',
+  'CNT',
+  'CSV',
+  'CAL',
+  'CHE',
+  'CHO',
 ];
 
 export default function GreetingForm({ onDone, darkMode }) {
