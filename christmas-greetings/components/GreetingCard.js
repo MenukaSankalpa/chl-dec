@@ -1,3 +1,5 @@
+// GreetingCard.jsx - Corrected to display companyName in the simple grid style.
+
 export default function GreetingCard({ g, index }) {
   const bgColors = [
     'bg-red-500/30',
@@ -15,13 +17,19 @@ export default function GreetingCard({ g, index }) {
   ];
   const colorIdx = index % bgColors.length;
 
+  // FIX: Check for g.companyName (new field) OR g.designation (legacy field)
+  const companyInfo = g.companyName || g.designation;
+
   return (
     <div
       className={`p-6 rounded-3xl backdrop-blur-xl border ${borderColors[colorIdx]} animate-fadeIn
         hover:scale-[1.05] transition w-full shadow-xl ${bgColors[colorIdx]} text-white`}
     >
       <div className="text-lg font-bold">{g.name}</div>
-      {g.designation && <div className="text-sm italic mt-1">{g.designation}</div>}
+      
+      {/* FIX: Display the company information */}
+      {companyInfo && <div className="text-sm italic mt-1">{companyInfo}</div>}
+      
       <p className="mt-3 line-clamp-3">{g.message}</p>
     </div>
   );
