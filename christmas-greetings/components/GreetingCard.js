@@ -1,20 +1,21 @@
-const usedPositions = []
+const usedPositions = [];
 
 export default function GreetingCard({ g, darkMode, index }) {
-  // Generate random non-overlapping positions
-  let top, left
-  let attempts = 0
+  let top, left;
+  let attempts = 0;
   do {
-    top = Math.random() * 70
-    left = Math.random() * 70
-    attempts++
-  } while (usedPositions.some(p => Math.abs(p.top - top) < 12 && Math.abs(p.left - left) < 12) && attempts < 100)
-  usedPositions.push({ top, left })
+    top = Math.random() * 70;
+    left = Math.random() * 70;
+    attempts++;
+  } while (
+    usedPositions.some(p => Math.abs(p.top - top) < 12 && Math.abs(p.left - left) < 12) &&
+    attempts < 100
+  );
+  usedPositions.push({ top, left });
 
-  // Random color
-  const colors = ['bg-red-500/30', 'bg-green-500/30', 'bg-white/30']
-  const borderColors = ['border-red-400', 'border-green-400', 'border-white/40']
-  const idx = index % 3
+  const colors = ['bg-red-500/30', 'bg-green-500/30', 'bg-white/30'];
+  const borderColors = ['border-red-400', 'border-green-400', 'border-white/40'];
+  const idx = index % 3;
 
   return (
     <div
@@ -26,5 +27,5 @@ export default function GreetingCard({ g, darkMode, index }) {
       {g.designation && <div className="text-sm">{g.designation}</div>}
       <p className="mt-3">{g.message}</p>
     </div>
-  )
+  );
 }

@@ -3,19 +3,22 @@ import clientPromise from '../../lib/mongodb';
 export default async function handler(req, res) {
   try {
     const client = await clientPromise;
-    const db = client.db('christmas-greetings');
+    const db = client.db('christmas_greetings'); // exact DB name
 
     if (req.method === 'GET') {
-      const greetings = await db.collection('greetings').find({}).sort({ _id: -1 }).toArray();
-      return res.status(200).json(greetings);
+      const messages = await db.collection('messages').find({}).sort({ _id: -1 }).toArray();
+      return res.status(200).json(messages);
     }
 
     if (req.method === 'POST') {
       const { name, designation, message } = req.body;
-      if (!name || !message) return res.status(400).json({ error: 'Name and message are required' });
 
-      const result = await db.collection('greetings').insertOne({ name, designation, message });
-      return res.status(201).json({ _id: result.insertedId, name, designation, message });
+      if (!name || !message) {
+        return res.status(400).json({ error: 'Name and message are required' });
+      }
+
+      const result = await db.collection('messages').insertOne({ name, designation, message });
+      return res.status(201).json(result);
     }
 
     return res.status(405).json({ error: 'Method not allowed' });
