@@ -1,60 +1,68 @@
-import { useEffect, useState, useRef } from 'react'
-import GreetingForm from '../components/GreetingForm'
-import GreetingCard from '../components/GreetingCard'
-import FestiveAnimation from '../components/FestiveAnimation'
-import Background from '../components/Background'
+import { useEffect, useState, useRef } from 'react';
+import GreetingForm from '../components/GreetingForm';
+import GreetingCard from '../components/GreetingCard';
+import Background from '../components/Background';
+import FestiveAnimation from '../components/FestiveAnimation';
 
 export default function Home() {
-  const [list, setList] = useState([])
-  const [submitted, setSubmitted] = useState(false)
-  const [darkMode, setDarkMode] = useState(true)
+  const [list, setList] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const trackAudioRef = useRef(null); // track01.mp3
+  const submitAudioRef = useRef(null); // music.mp3
 
-  // ✅ Audio refs
-  const formAudioRef = useRef(null)
-  const submitAudioRef = useRef(null)
-
-  // Load greetings
-  const load = async () => {
-    const r = await fetch('/api/greetings')
-    setList(await r.json())
-  }
-  useEffect(() => { load() }, [])
-
-  // Set dark/light mode
+  // Toggle dark mode
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode)
-  }, [darkMode])
+    document.documentElement.classList.toggle('dark', darkMode);
+  }, [darkMode]);
 
-  // Play track01 on form load
-  useEffect(() => {
-    if (!submitted && formAudioRef.current) {
-      formAudioRef.current.play().catch(() => {})
+  // Load greetings from API
+  const loadGreetings = async () => {
+    try {
+      const res = await fetch('/api/greetings');
+      if (!res.ok) throw new Error('Failed to fetch greetings');
+      const data = await res.json();
+      setList(data);
+    } catch (err) {
+      console.error(err);
     }
-  }, [submitted])
+  };
+
+  useEffect(() => {
+    loadGreetings();
+  }, []);
+
+  // Play track01 when form loads
+  useEffect(() => {
+    if (!trackAudioRef.current) {
+      trackAudioRef.current = new Audio('/track01.mp3');
+      trackAudioRef.current.loop = true;
+      trackAudioRef.current.volume = 0.2;
+      trackAudioRef.current.play().catch(() => {});
+    }
+  }, []);
 
   const handleFormDone = () => {
-    // Stop form music
-    if (formAudioRef.current) formAudioRef.current.pause()
+    // Stop track01 and play music.mp3
+    if (trackAudioRef.current) trackAudioRef.current.pause();
 
-    // Play music after submission
-    if (submitAudioRef.current) {
-      submitAudioRef.current.play().catch(() => {})
+    if (!submitAudioRef.current) {
+      submitAudioRef.current = new Audio('/music.mp3');
+      submitAudioRef.current.loop = true;
+      submitAudioRef.current.volume = 0.2;
     }
+    submitAudioRef.current.play().catch(() => {});
 
-    setSubmitted(true)
-  }
+    setSubmitted(true);
+    loadGreetings(); // reload saved greetings
+  };
 
   return (
     <div className="relative min-h-screen px-4 py-10 overflow-hidden">
-      
-      {/* Audio Elements */}
-      <audio ref={formAudioRef} src="/track01.mp3" loop preload="auto" />
-      <audio ref={submitAudioRef} src="/music.mp3" loop preload="auto" />
-
       {/* Background */}
       <Background darkMode={darkMode} showSnow={!submitted} />
 
-      {/* Snow + flying icons */}
+      {/* Snow + flying effects */}
       <FestiveAnimation show={!submitted} darkMode={darkMode} />
 
       {/* Dark/Light toggle */}
@@ -67,16 +75,16 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Form or Cards */}
+      {/* Form or greetings */}
       {!submitted ? (
         <GreetingForm onDone={handleFormDone} darkMode={darkMode} />
       ) : (
         <div className="relative w-full h-[90vh]">
           {list.map((g, idx) => (
-            <GreetingCard key={g._id || idx} g={g} darkMode={darkMode} index={idx} />
+            <GreetingCard key={g._id} g={g} darkMode={darkMode} index={idx} />
           ))}
         </div>
       )}
     </div>
-  )
+  );
 }
